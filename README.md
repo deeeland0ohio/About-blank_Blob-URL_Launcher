@@ -1,3 +1,3 @@
-# About-blank-launcher
-launches websites in about:blank and
+# About-blank and Blob-URL Launcher
+launches websites in about:blank/blob: URL and
 makes your tab invisible to goguardian!
