@@ -13,6 +13,13 @@
             font-family: Arial, sans-serif;
             gap: 20px;
         }
+        .info-text {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
         .container {
             display: flex;
             gap: 10px;
@@ -54,56 +61,103 @@
     </style>
 </head>
 <body>
+
+    <div class="info-text">Https:// is recommended for it to work properly</div>
+
     <div class="container">
         <label>About:Blank</label>
         <input type="text" value="" placeholder="https://example.com" id='input' autofocus>
         <button onclick='create()'>Launch</button>
     </div>
+
     <div class="container">
         <label>Blob URL</label>
         <input type="text" value="" placeholder="https://example.com" id='blobInput'>
         <button class="blob-btn" onclick='createBlob()'>Launch</button>
     </div>
+
     <script>
+        function formatUrl(inputElement) {
+            let url = inputElement.value.trim();
+            if (!url) return '';
+
+            const protocolRegex = /^(https?|htps?|ttps?|hp?tps?):?\/*(.*?)$/i;
+            const match = url.match(protocolRegex);
+
+            if (url.startsWith('https://') || url.startsWith('http://')) {
+                return url;
+            }
+
+            if (match) {
+                const domainAndPath = match[2];
+                if (!domainAndPath) {
+                    url = 'https://' + url;
+                } else {
+                    url = 'https://' + domainAndPath;
+                }
+            } else {
+                url = 'https://' + url;
+            }
+
+            inputElement.value = url;
+            return url;
+        }
+
         function create() {
-            var url = document.getElementById('input').value;
+            var inputEl = document.getElementById('input');
+            var url = formatUrl(inputEl);
+            if (!url) return;
+
             var win = window.open();
             win.document.body.style.margin = '0';
             win.document.body.style.height = '100vh';
+            
             var iframe = win.document.createElement('iframe');
             iframe.style.border = 'none';
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.margin = '0';
             iframe.src = url;
+            
             win.document.body.appendChild(iframe);
         }
 
         function createBlob() {
-            var url = document.getElementById('blobInput').value;
-            
+            var inputEl = document.getElementById('blobInput');
+            var url = formatUrl(inputEl);
+            if (!url) return;
+
             var htmlContent = `
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta name="referrer" content="no-referrer">
+                    <title>Loading...</title>
                     <style>
-                        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+                        html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
                         iframe { border: none; width: 100%; height: 100%; }
                     </style>
+                    <script>
+                        if (window.opener) {
+                            window.opener = null;
+                        }
+                    <\/script>
                 </head>
                 <body>
-                    <iframe src="${url}"></iframe>
+                    <iframe src="${url}" allow="fullscreen"></iframe>
                 </body>
                 </html>
             `;
-
-            var blob = new Blob([htmlContent], { type: 'text/html' });
             
+            var blob = new Blob([htmlContent], { type: 'text/html' });
             var blobUrl = URL.createObjectURL(blob);
             
-            window.open(blobUrl);
+            var newWindow = window.open();
+            if (newWindow) {
+                newWindow.opener = null;
+                newWindow.location.href = blobUrl;
+            }
         }
     </script>
 </body>
 </html>
-
