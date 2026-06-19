@@ -8,10 +8,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
             gap: 20px;
+            padding: 20px 0;
+            box-sizing: border-box;
         }
         .info-text {
             color: #ffffff;
@@ -28,7 +30,8 @@
         label {
             color: #888;
             font-size: 14px;
-            width: 90px;
+            width: 140px; 
+            box-sizing: border-box;
         }
         input[type="text"] {
             padding: 10px 15px;
@@ -38,6 +41,26 @@
             color: #fff;
             outline: none;
             width: 250px;
+            height: 40px; 
+            box-sizing: border-box;
+        }
+        textarea {
+            padding: 10px 15px;
+            border-radius: 14px;
+            border: 1px solid #444;
+            background-color: #222;
+            color: #fff;
+            outline: none;
+            width: 250px;
+            height: 120px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            resize: vertical;
+            box-sizing: border-box;
+            display: block;
+        }
+        textarea:focus, input[type="text"]:focus {
+            border-color: #007bff;
         }
         button {
             padding: 10px 20px;
@@ -48,6 +71,11 @@
             cursor: pointer;
             font-weight: bold;
             width: 110px;
+            height: 40px; 
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
         button:hover {
             background-color: #0056b3;
@@ -57,6 +85,12 @@
         }
         button.blob-btn:hover {
             background-color: #218838;
+        }
+        button.code-btn {
+            background-color: #dc3545;
+        }
+        button.code-btn:hover {
+            background-color: #bd2130;
         }
     </style>
 </head>
@@ -76,10 +110,20 @@
         <button class="blob-btn" onclick='createBlob()'>Launch</button>
     </div>
 
+    <div class="container">
+        <label>Html in About:blank</label>
+        <textarea placeholder="Type or paste your HTML code here..." id="codeEditor"></textarea>
+        <button class="code-btn" onclick="runCustomCode()">Launch</button>
+    </div>
+
     <script>
         function formatUrl(inputElement) {
             let url = inputElement.value.trim();
-            if (!url) return '';
+            
+            if (!url) {
+                inputElement.value = '';
+                return '';
+            }
 
             const protocolRegex = /^(https?|htps?|ttps?|hp?tps?):?\/*(.*?)$/i;
             const match = url.match(protocolRegex);
@@ -156,6 +200,26 @@
             if (newWindow) {
                 newWindow.opener = null;
                 newWindow.location.href = blobUrl;
+            }
+        }
+
+        function runCustomCode() {
+            const editorEl = document.getElementById('codeEditor');
+            const userCode = editorEl.value;
+            
+            if (!userCode.trim()) {
+                editorEl.value = '';
+                return;
+            }
+
+            const newWindow = window.open('about:blank', '_blank');
+            
+            if (newWindow) {
+                newWindow.document.open();
+                newWindow.document.write(userCode);
+                newWindow.document.close();
+            } else {
+                alert('Pop-up blocked! Please allow pop-ups for this page to see the preview.');
             }
         }
     </script>
